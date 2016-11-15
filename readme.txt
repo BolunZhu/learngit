@@ -1,4 +1,1 @@
-hello world
-change twice
-git tracks changes
-haha!
+This is zhubolun’s place to store my code.
