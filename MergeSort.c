@@ -1,8 +1,8 @@
 //
-//  main.c
-//  testplayground
+//  MergeSort.c
+//  test in -testplayground
 //
-//  Created by 朱博抡 on 2016/11/16.
+//  Created by 朱博抡 on 2016/11/15.
 //  Copyright © 2016年 朱博抡. All rights reserved.
 //
 
