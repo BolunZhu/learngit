@@ -13,7 +13,7 @@ void MergeSort(int A[],int p,int r);
 int main (void)
 {
     int num=0;
-    printf("give num to A[]\n");
+    printf("give num to A[num] for merge sort!\n");
     scanf("%d",&num);
     int A[num];
     for (int l=0; l<num; l++) {
@@ -52,8 +52,8 @@ void merge(int A[],int p,int q,int r)
     {
         L[i]=A[q+i+1];
     }
-    R[n]=2^30;
-    L[m]=2^30;
+    R[n]=2^31-1;
+    L[m]=2^31-1;
     int i=0;
     int j=0;
     for(int k=0;k<r-p+1;k++)
