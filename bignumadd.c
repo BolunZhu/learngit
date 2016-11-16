@@ -1,6 +1,6 @@
 //
-//  main.c
-//  test2
+//  bignumadd.c
+//  Computation of add two big number which could not be stored in Interger.
 //
 //  Created by 朱博抡 on 2016/10/11.
 //  Copyright © 2016年 朱博抡. All rights reserved.

@@ -1,14 +1,10 @@
 //
 //  487-3279.c
-//  
+//  from POJ 1003
 //
 //  Created by 朱博抡 on 2016/10/22.
 //
 //
-/*
-    初始化
- 
- */
 
 #include <stdio.h>
 #include <string.h>
