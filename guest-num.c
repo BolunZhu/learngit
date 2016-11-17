@@ -50,5 +50,7 @@ int main(void)
         //fortest
         printf("\n%dA%dB\n",A,B);
     }
+    printf("you win!");
+    return 0;
     
 }
