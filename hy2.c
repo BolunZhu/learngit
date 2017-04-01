@@ -1,4 +1,4 @@
-include<stdio.h>
+#include<stdio.h>
 int yh(int x,int y);
 int main (void)
 {

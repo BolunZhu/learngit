@@ -1,23 +1,31 @@
-include<stdio.h>
+#include <stdio.h>
 
 int main (void)
 {
-    char c;
-    int flag=0;
-    while ((c=getchar())!='\n') {
-        if (c==' ') {
-            if (flag==1) {
-                continue;
+    int n;
+    scanf("%d",&n);
+    while (getchar()!='\n') {
+        ;
+    }
+    for (int i=0; i<n; i++) {
+        char c;
+        int flag=0;
+        while ((c=getchar())!='\n'){
+            if (c==' ') {
+                if (flag==1) {
+                    continue;
+                }
+                else{
+                    flag=1;
+                }
             }
             else{
-                flag=1;
+                flag=0;
             }
+            putchar(c);
         }
-        else{
-            flag=0;
-        }
-        putchar(c);
+        putchar('\n');
     }
-    putchar('\n');
+    
     return 0;
 }
