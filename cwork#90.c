@@ -21,6 +21,6 @@ int main(){
             printf("%d->",*p[i]);
         }
         printf("%d\n",*p[9]);
-    } while (getchar()!=EOF);
+    } while (getch()!=EOF);
     return 0;
 }
