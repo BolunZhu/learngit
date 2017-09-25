@@ -36,20 +36,641 @@ int main()
 
 
     ShowMenu();
+    ClearScreen();
+    CreatList(&gp_head);
     RunSys(&gp_head);
-    /*gi_sel_menu=2;
-    TagMainMenu(gi_sel_menu);
-    PopMenu(gi_sel_menu);
-    getch();
-    PopOff();*/
-
+//    RunSystem();
     getch();
     return 0;
+}
+BOOL Theme(void)
+{
+	BOOL bRet = TRUE;
+	ClearScreen();
+	printf("\n");
+	printf("《系统快捷操作指南》\n"); Delay();
+	printf(" 1、   F1    显示帮助主题\n"); Delay();
+	printf(" 2、Alt + X  退出系统;\n"); Delay();
+	printf(" 3、Alt + C  清除屏幕;\n"); Delay();
+	printf(" 4、Alt + F  弹出\"文件(F)\"的下拉菜单;\n"); Delay();
+	printf(" 5、Alt + E  弹出\"编辑(E)\"的下拉菜单;\n"); Delay();
+	printf(" 6、Alt + I  弹出\"查询(I)\"的下拉菜单;\n"); Delay();
+	printf(" 7、Alt + S  弹出\"统计(S)\"的下拉菜单;\n"); Delay();
+	printf(" 8、Alt + H  弹出\"帮助(H)\"的下拉菜单;\n"); Delay();
+	printf(" 9、ESC  键  关闭弹出窗口,回到主菜单栏;\n"); Delay();
+	printf("10、Enter键  执行相应的功能函数;\n"); Delay();
+	return bRet;
+}
+inline void Delay(void)
+{
+	int goal;
+	goal = 50 + clock();
+	while (goal > clock());
+}
+BOOL AboutSys(void)
+{
+	BOOL bRet = TRUE;
+	ClearScreen();
+	printf("\n\t\t   【** Programming Instructions **】\n"); Delay();
+	printf(" \t┌────────────────────────────┐\n"); Delay();
+	printf(" \t│★ 本系统可在VS、CODE:BLOCKS中运行;                     │\n"); Delay();
+	printf(" \t│★ 系统支持快捷键操作,简单的键盘操作;                   │\n"); Delay();
+	printf(" \t│★ 本系统大量使用了标注,尽量使程序明了易懂;             │\n"); Delay();
+	printf(" \t│★ 运用较多的结构,用三方向的十字交叉链表储存信息;       │\n"); Delay();
+	printf(" \t│★ 运用数组,指针,结构及文件输入输出,控制台等知识。      │\n"); Delay();
+	printf(" \t│★ 系统主要提供招生信息的快速查询、检索和统计;          │\n"); Delay();
+	printf(" \t│★ 本程序有招生信息查询,信息录入,修改,删除等功能.       │\n"); Delay();
+	printf("    ┌────────────────────────────────┐\n"); Delay();
+	printf("    │【参考文献】:\t\t\t\t\t\t      │\n    │ [1]曹计昌,卢萍,李开. C语言程序设计,北京：科学出版社,2008;      │\n"); Delay();
+	printf("    │ [2]李开,卢萍,曹计昌. C语言实验与课程设计,北京：科学出版社,2011;│\n");
+	printf("    └────────────────────────────────┘\n");
+	return bRet;
+}
+/**
+*函数名称：InsertUniPrint
+*函数功能：插入学校
+*输入参数：无
+*输出参数：无
+*返回值：总是为TRUE
+*/
+BOOL InsertUniPrint(void){
+    UNIVERSITY_NODE * uni_node;
+    uni_node=(UNIVERSITY_NODE *)malloc(sizeof(UNIVERSITY_NODE));
+    ClearScreen();
+    printf("请输入要插入的高校结点的信息：\n");
+    printf("请输入高校名称：");
+    while (scanf("%s", uni_node->uni_id) == EOF) {  //系统输入错误时的处理
+		getchar();
+	}
+    printf("\n请输入高校代码：如：10001\n");
+    while (scanf("%s", uni_node->uni_name) == EOF) {  //系统输入错误时的处理
+		getchar();
+	}
+    printf("\n请输入高校地址：如：武汉市洪山区关山街1037号\n");
+    while (scanf("%s", uni_node->uni_add) == EOF) {  //系统输入错误时的处理
+		getchar();
+	}
+	printf("\n请输入高校联系电话：如：6743342\n");
+    while (scanf("%s", uni_node->uni_call) == EOF) {  //系统输入错误时的处理
+		getchar();
+	}
+	uni_node->next=NULL;
+	uni_node->snext=NULL;
+	InsertUniNode(gp_head,uni_node);
+	printf("\n插入成功\n");
+	return  TRUE;
+}
+/**
+*函数名称：InsertSpePrint
+*函数功能：插入专业
+*输入参数：无
+*输出参数：无
+*返回值：总是为TRUE
+*/
+BOOL InsertSpeprint(void){
+    char str1[80];
+    UNIVERSITY_NODE * puni;
+    SPECIALTY_NODE * pspe;
+    pspe=(SPECIALTY_NODE *)malloc(sizeof(SPECIALTY_NODE));
+    ClearScreen();
+    printf("请输入专业所属的学校名字：   ");
+    while (scanf("%s", str1) == EOF) {  //系统输入错误时的处理
+		getchar();
+	}
+	puni=SeekUniNode(gp_head,str1);
+	if(puni==NULL){
+        printf("没有找到该学校！\n");
+        return TRUE;
+	}
+    printf("\n请输入专业名称：");
+    while (scanf("%s", pspe->spe_id) == EOF) {  //系统输入错误时的处理
+		getchar();
+	}
+	printf("\n请输入专业编号：");
+    while (scanf("%s", pspe->spe_name) == EOF) {  //系统输入错误时的处理
+		getchar();
+	}
+    printf("\n请输入专业排名：");
+    while (scanf("%d", &pspe->rank) == EOF) {  //系统输入错误时的处理
+		getchar();
+	}
+	strcpy(pspe->uni_id,puni->uni_id);
+	strcpy(pspe->uni_name,puni->uni_name);
+	pspe->next=NULL;
+	pspe->rnext=NULL;
+	InsertSpeNode(puni,pspe);
+	return TRUE;
+}
+/**
+*函数名称：InsertRecPrint
+*函数功能：插入专业
+*输入参数：无
+*输出参数：无
+*返回值：总是为TRUE
+*/
+BOOL InsertRecprint(void){
+    char str1[80];
+    int i,j;
+//    unsigned long int num;
+    UNIVERSITY_NODE * puni;
+    SPECIALTY_NODE * pspe;
+    RECRUIT_NODE * prec;
+    prec=(RECRUIT_NODE *)malloc(sizeof(RECRUIT_NODE));
+    ClearScreen();
+    printf("请输入招生信息所属的学校名字：   ");
+    while (scanf("%s", str1) == EOF) {  //系统输入错误时的处理
+		getchar();
+	}
+	puni=SeekUniNode(gp_head,str1);
+	if(puni==NULL){
+        printf("没有找到该学校！\n");
+        return TRUE;
+	}
+	printf("请输入招生信息所属的专业名字：   ");
+    while (scanf("%s", str1) == EOF) {  //系统输入错误时的处理
+		getchar();
+	}
+	pspe=SeekSpeNode(puni,str1);
+	if(pspe==NULL){
+        printf("没有找到该专业！\n");
+        return TRUE;
+	}
+	printf("\n请输入招生年份：");
+    while (scanf("%s", prec->year) == EOF) {  //系统输入错误时的处理
+		getchar();
+	}
+	for(i=0;i<PROVINCE_NUM;i++){
+        printf("\n请输入 %s 省计划招生人数：",prov_name[i]);
+    while (scanf("%lu",& prec->pre_num[i]) == EOF) {  //系统输入错误时的处理
+		getchar();
+	}
+        printf("\n请输入 %s 省实际招生人数：",prov_name[i]);
+    while (scanf("%lu",& prec->re_num[i]) == EOF) {  //系统输入错误时的处理
+		getchar();
+	}
+//	printf("\n请输入 %s 省投档分数线：",prov_name[i]);
+//    while (scanf("%lu",& prec->lowest_w[i]) == EOF) {  //系统输入错误时的处理
+//		getchar();
+//	}
+	printf("\n请输入 %s 省最低分数线：",prov_name[i]);
+	while (scanf("%ud", &prec->lowest_r[i]) == EOF) {  //系统输入错误时的处理
+		getchar();
+	}
+	printf("\n请输入 %s 省最高分数线：",prov_name[i]);
+	while (scanf("%ud",& prec->highest_r[i]) == EOF) {  //系统输入错误时的处理
+		getchar();
+	}
+	}
+	strcpy(prec->uni_id,puni->uni_id);
+	strcpy(prec->uni_name,puni->uni_name);
+	strcpy(prec->spe_id,pspe->spe_id);
+	strcpy(prec->spe_name,pspe->spe_name);
+	prec->next=NULL;
+	InsertRecNode(pspe,prec);
+	return TRUE;
+}
+/**
+*函数名称：DelUniPrint
+*函数功能：删除学校
+*输入参数：无
+*输出参数：无
+*返回值：总是为TRUE
+*/
+BOOL DelUniPrint(){
+    char  str[80];
+    UNIVERSITY_NODE * puni;
+    ClearScreen();
+    printf("请输入将要删除的高校的名称:\n");
+    printf("|*注意！高校的所属的专业、招生信息也将一并被删除!*|\n");
+    scanf("%s",str);
+    puni=SeekUniNode(gp_head,str);
+    if(puni==NULL){
+        printf("没有找到该学校");
+        return TRUE;
+    }
+    printf("找到相关的高校信息如下:\n");
+    printf("\t学校名称:    %s\n", puni->uni_id);
+    printf("\t学校编号:    %s\n", puni->uni_name);
+   //printf("\t学校全国排名: %d\n", puni->rank); Delay();
+    //printf("\t学校类型:    %s\n", puni->schoolType);
+    printf("\t学校地址:    %s\n", puni->uni_add);
+    printf("\t联系方式:    %s\n", puni->uni_call);
+    DelUniNode(gp_head,str);
+    printf("该高校及其子节点信息已经被删除");
+    return TRUE;
+}
+/**
+*函数名称：DelSpePrint
+*函数功能：删除专业
+*输入参数：无
+*输出参数：无
+*返回值：总是为TRUE
+*/
+BOOL DelSpePrint(){
+    char  str[80];
+    UNIVERSITY_NODE * puni;
+    ClearScreen();
+    printf("请输入将要删除的专业所属的高校的名称:\n");
+//    printf("|*注意！高校的所属的专业、招生信息也将一并被删除!*|\n");
+    scanf("%s",str);
+    puni=SeekUniNode(gp_head,str);
+    if(puni==NULL){
+        printf("没有找到该学校");
+        return TRUE;
+    }
+    printf("找到相关的高校信息如下:\n");
+    printf("\t学校名称:    %s\n", puni->uni_id);
+    printf("\t学校编号:    %s\n", puni->uni_name);
+   //printf("\t学校全国排名: %d\n", puni->rank); Delay();
+    //printf("\t学校类型:    %s\n", puni->schoolType);
+    printf("\t学校地址:    %s\n", puni->uni_add);
+    printf("\t联系方式:    %s\n", puni->uni_call);
+    printf("请输入将要删除的专业名称:\n");
+    scanf("%s",str);
+    DelSpeNode(puni,str);
+    printf("专业信息以及该专业的招生信息已经被删除！\n");
+    return TRUE;
+}
+/**
+*函数名称：DelRedPrint
+*函数功能：删除专业
+*输入参数：无
+*输出参数：无
+*返回值：总是为TRUE
+*/
+BOOL DelRecPrint(){
+    char  str[80];
+    UNIVERSITY_NODE * puni;
+    SPECIALTY_NODE * pspe;
+    ClearScreen();
+    printf("请输入将要删除的招生信息所属的高校的名称:\n");
+//    printf("|*注意！高校的所属的专业、招生信息也将一并被删除!*|\n");
+    scanf("%s",str);
+    puni=SeekUniNode(gp_head,str);
+    if(puni==NULL){
+        printf("没有找到该学校");
+        return TRUE;
+    }
+    printf("找到相关的高校信息如下:\n");
+    printf("\t学校名称:    %s\n", puni->uni_id);
+    printf("\t学校编号:    %s\n", puni->uni_name);
+   //printf("\t学校全国排名: %d\n", puni->rank); Delay();
+    //printf("\t学校类型:    %s\n", puni->schoolType);
+    printf("\t学校地址:    %s\n", puni->uni_add);
+    printf("\t联系方式:    %s\n", puni->uni_call);
+    printf("请输入将要删除的招生信息所属专业名称:\n");
+    scanf("%s",str);
+    pspe=SeekSpeNode(puni,str);
+    printf("请输入将要删除的招生信息年份:         如：2016\n");
+    scanf("%s",str);
+    DelRecNode(pspe,str);
+    printf("该招生信息已经被删除！\n");
+    return TRUE;
+}
+/**
+*函数名称：SeekUniPrint
+*函数功能：查询学校
+*输入参数：无
+*输出参数：无
+*返回值：总是为TRUE
+*/
+BOOL SeekUniPrint(void){
+    char  str[80];
+    UNIVERSITY_NODE * puni;
+    ClearScreen();
+    printf("请输入学校的名称:\n");
+    scanf("%s",str);
+    puni=SeekUniNode(gp_head,str);
+    if(puni==NULL){
+        printf("没有找到该学校");
+        return TRUE;
+    }
+    printf("找到相关的高校信息如下:\n");
+    printf("\t学校名称:    %s\n", puni->uni_id);
+    printf("\t学校编号:    %s\n", puni->uni_name);
+   //printf("\t学校全国排名: %d\n", puni->rank); Delay();
+    //printf("\t学校类型:    %s\n", puni->schoolType);
+    printf("\t学校地址:    %s\n", puni->uni_add);
+    printf("\t联系方式:    %s\n", puni->uni_call);
+    return TRUE;
+}
+/**
+*函数名称：SeekSpePrint
+*函数功能：查询专业
+*输入参数：无
+*输出参数：无
+*返回值：总是为TRUE
+*/
+BOOL SeekSpePrint(void){
+   char  str[100];
+   int flag=0;//flag立起则已经找到
+   UNIVERSITY_NODE * puni_node=NULL;
+   SPECIALTY_NODE *pspe_temp=NULL;
+   ClearScreen();
+   printf("请输入专业的名称:\n");
+   scanf("%s",str);
+   for(puni_node=gp_head->next;puni_node!=NULL;puni_node=puni_node->next){
+        pspe_temp=SeekSpeNode(puni_node,str);
+        if(pspe_temp!=NULL){
+            if(flag==0){
+                printf("\n高校名称\t专业名称\t全国排名\n");
+            }
+            flag=1;
+            printf("%-16s%-24s%d\n", pspe_temp->uni_id, pspe_temp->spe_id,
+					 pspe_temp->rank);
+        }
+   }
+   if(flag==0){
+    printf("没有找到该专业！\n");
+   }
+   return TRUE;
+}
+/**
+*函数名称：SeekRecPrint
+*函数功能：查询招生
+*输入参数：无
+*输出参数：无
+*返回值：总是为TRUE
+*/
+BOOL SeekRecPrint(void)
+{
+    char  str1[80],str2[80],str3[80];
+    UNIVERSITY_NODE * puni;
+    SPECIALTY_NODE * pspe;
+    RECRUIT_NODE * prec;
+    int i=0;
+    ClearScreen();
+    printf("请输入您所在的省份(前两个字):\n");
+    scanf("%s",str1);
+    for(i=0;i<PROVINCE_NUM;i++){
+        if(strcmp(str1,prov_name[i])==0){
+            printf("请输入学校的名称:\n");
+            scanf("%s",str2);
+            if((puni=SeekUniNode(gp_head,str2))!=NULL){
+                printf("请输入专业的名称:\n");
+                scanf("%s",str3);
+                pspe=SeekSpeNode(puni,str3);
+                if(pspe!=NULL){
+                    printf("高校名称\t专业名称\t年份\t招生计划\t实际录取人数\t最低分数线\n");
+                    for(prec=pspe->rnext;prec!=NULL;prec=prec->next){
+                        printf("%s %s %s %lu %lu %ud\n",prec->uni_id,prec->spe_id,prec->year,prec->pre_num[i],prec->re_num[i],prec->lowest_r[i]);
+                    }
+                return TRUE;
+            }
+           printf("没有找到该专业!\n按任意键继续...\n");
+                getch();
+                return TRUE;
+        }
+         printf("没有找到该学校!\n按任意键继续...\n");
+            getch();
+            return TRUE;
+        }
+    }
+    printf("没有找到该省份！\n按任意键继续...\n");
+    getch();
+    return TRUE;
+}
+/**
+*函数名称：SaveSysData
+*函数功能：保存系统代码表和三类基础数据
+*输入参数：hd 主链头节点指针
+*输出参数：无
+*返回值：总是为TRUE
+*/
+BOOL SaveSysData(UNIVERSITY_NODE * hu)
+{
+    UNIVERSITY_NODE * puni_node;
+    SPECIALTY_NODE * pspe_node;
+    RECRUIT_NODE * prec_node;
+    FILE * pfout;
+//    int handle;
+    ClearScreen();
+//    if((handle=open(gp_uni_code_filename,O_WRONLY|O_TEXT))==-1)
+//    {
+//        handle=open(gp_uni_code_filename,O_CREAT|O_TEXT,S_IWRITE);
+//    }
+//    write(handle,gp_uni_code,gul_uni_code_len); /*保存学校代码表*/
+//    close(handle);
+//
+//    if((handle=open(gp_spe_code_filename,O_WRONLY|O_TEXT))==-1)
+//    {
+//        handle=open(gp_spe_code_filename,O_WRONLY|O_TEXT,S_IWRITE);
+//    }
+//    write(handle,gp_spe_code,gul_spe_code_len);/*保存专业代码表*/
+//    close(handle);
+
+    pfout=fopen(gp_univ_info_filename,"wb");
+    for(puni_node=hu;puni_node!=NULL;puni_node=puni_node->next)
+    {/*保存高校信息*/
+        printf("%s  %d\n",puni_node->uni_id,puni_node->next==NULL);
+        fwrite(puni_node,sizeof(UNIVERSITY_NODE),1,pfout);
+    }
+    fclose(pfout);
+
+    pfout=fopen(gp_spe_info_filename,"wb");
+    for(puni_node=hu;puni_node!=NULL;puni_node=puni_node->next)
+    {/*保存专业信息*/
+        pspe_node=puni_node->snext;
+        while(pspe_node!=NULL){
+            fwrite(pspe_node,sizeof(SPECIALTY_NODE),1,pfout);
+            pspe_node=pspe_node->next;
+        }
+    }
+    fclose(pfout);
+
+    pfout=fopen(gp_rec_info_filename,"wb");
+
+    for(puni_node=hu;puni_node!=NULL;puni_node=puni_node->next)
+    {/*保存招生信息*/
+        pspe_node=puni_node->snext;
+        while(pspe_node!=NULL){
+            prec_node=pspe_node->rnext;
+            while(prec_node!=NULL){
+                fwrite(prec_node,sizeof(RECRUIT_NODE),1,pfout);
+                prec_node=prec_node->next;
+            }
+            pspe_node=pspe_node->next;
+        }
+    }
+    fclose(pfout);
+
+    return TRUE;
+}
+//BOOL SaveData(void)
+//{
+//	ClearScreen();
+//	Load_list(&g_headp, &headp, FileName);
+//	Save_list(g_headp, FileName);
+//	return TRUE;
+//}
+BOOL Save_list(void)
+{
+//	FILE *fout1, *fout2, *fout3, *fout4;
+    FILE *fout1, *fout2, *fout3;
+	UNIVERSITY_NODE *p1 = gp_head;
+	SPECIALTY_NODE *p2;
+	RECRUIT_NODE *p3;
+//	PROV_SCORE *p4 = headp;
+	if ((fout1 = fopen(gp_univ_info_filename, "wb+")) == NULL)
+		exit(-1);
+	if ((fout2 = fopen(gp_spe_info_filename, "wb+")) == NULL)
+		exit(-1);
+	if ((fout3 = fopen(gp_rec_info_filename, "wb+")) == NULL)
+		exit(-1);
+//	if ((fout4 = fopen(filename[3], "wb+")) == NULL)
+//		exit(-1);
+	while (p1 != NULL) {
+		fwrite(p1, sizeof(UNIVERSITY_NODE), 1, fout1);
+		p2 = p1->snext;
+		while (p2 != NULL) {
+			fwrite(p2, sizeof(SPECIALTY_NODE), 1, fout2);
+			p3 = p2->rnext;
+			while (p3 != NULL) {
+				fwrite(p3, sizeof(RECRUIT_NODE), 1, fout3);
+				p3 = p3->next;
+			}
+			p2 = p2->next;
+		}
+		p1 = p1->next;
+	}
+//	while (p4 != NULL) {
+//		fwrite(p4, sizeof(PROV_SCORE), 1, fout4);
+//		p4 = p4->next;
+//	}
+	fclose(fout1);
+	fclose(fout2);
+	fclose(fout3);
+//	fclose(fout4);
+	printf("【 相关数据已保存! 】\n");
+	return TRUE;
+}
+/**
+*函数名称：LoadData
+*函数功能：将基础数据从数据文件中载入到内存缓冲区和十字链表中
+*输入参数：无
+*输出参数：无
+*返回值：成功则TRUE，否则返回NULL 并且程序结束
+*/
+BOOL LoadData()
+{
+    int Re=0;
+    if(gp_uni_code !=NULL){
+        free(gp_uni_code);
+    }
+    gul_uni_code_len=LoadCode(gp_uni_code_filename,&gp_uni_code);
+    if(gul_uni_code_len<3){
+        printf("学校代码表加载失败!\n");
+        gc_sys_state &= 0xfe;
+    }
+    else{
+        printf("学校代码表加载成功!\n");
+        gc_sys_state|=1;
+    }
+    if(gp_spe_code!=NULL){
+        free(gp_spe_code);
+    }
+    gul_spe_code_len=LoadCode(gp_spe_code_filename,&gp_spe_code);
+    if(gul_spe_code_len<4){
+        printf("专业代码表加载失败!\n");
+        gc_sys_state &= ~2;
+    }
+    else{
+        printf("专业代码表加载成功!\n");
+        gc_sys_state|=2;
+    }
+    Re=CreatList(&gp_head);
+    gc_sys_state |= Re;
+    gc_sys_state &= ~(4+8+16-Re);
+    if(gc_sys_state<(1|2|4|8|16)){
+        /*加载信息数据不完整*/
+        printf("\n信息加载不完整!\n");
+        printf("\n按任意键继续...\n");
+        getch();
+    }
+
+    return TRUE;
+}
+/**
+*函数名称：LoadCode
+*函数功能：将文本代码表载入到内存缓冲区，并进行排序和去除空格
+*输入参数：FileName 存放代码表的数据文件名字
+*输出参数：pBuffer 指向内存缓冲区的指针变量的地址
+*返回值：存放代码表的内存缓冲区的大小（以字节为单位）
+*/
+int LoadCode(char * FileName,char ** pBuffer)
+{
+    char * pTemp,*pStr1,*pStr2;
+    int handle;
+    int BufferLen,len,loc1,loc2,i;
+    long filelen;
+    /*如果以只读的方式打开失败*/
+    if((handle=open(FileName,O_RDONLY|O_TEXT))==-1)
+    {
+        handle=open(FileName,O_CREAT|S_IREAD);/*以创建方式打开*/
+    }
+    filelen=filelength(handle);/*数据文件的长度*/
+    pTemp=(char*)calloc(filelen+1,sizeof(char));/*申请同样大小的动态存储区*/
+    BufferLen=read(handle,pTemp,filelen);/*将数据文件的内容全部读入到内存*/
+    close(handle);
+
+    /*在动态存储区尾存一个空字符，作为字符串结束标志*/
+    *(pTemp+BufferLen)='\0';
+    BufferLen++;
+    for(i=0;i<BufferLen;i++){/*将动态存储区中的所有换行符替换成空字符*/
+        if(*(pTemp+i)=='\n'){
+            *(pTemp+i)='\0';
+        }
+    }
+
+    /*再申请一块同样大小的动态存储区，用于存放排序后的代码串*/
+    *pBuffer=(char*)calloc(BufferLen,sizeof(char));
+    loc2=0;
+    pStr1=pTemp;
+    len=strlen(pStr1);
+    while(BufferLen>len+1)/*选择排序*/
+    {
+        loc1=len+1;
+        while(BufferLen>loc1){/*每趟找到序列中最小代码串，首地址存入pStr1*/
+            pStr2=pTemp+loc1;
+            if(strcmp(pStr1,pStr2)>0)
+            {
+                pStr1=pStr2;
+            }
+            loc1 += strlen(pStr2)+1;
+        }
+        len = strlen(pStr1);    /*这一趟找到的最小代码串长度*/
+
+        /*如果不是空串 则复制，loc2是下一个最小代码串存放地址的偏移量*/
+        if(len>0)
+        {
+            strcpy(*pBuffer+loc2,pStr1);
+            loc2 += len +1;/*已经复制的代码串所占存储空间的大小*/
+        }
+
+        /*将最小代码串从序列中删除掉*/
+        for(i=0;i<BufferLen-(pStr1-pTemp)-(len+1);i++)
+        {
+            *(pStr1+i)=*(pStr1+i+len+1);
+        }
+        BufferLen -= len+1;/*下一趟排序所处理序列的长度*/
+        pStr1=pTemp;    /*假定序列的第一个代码串为最小代码串*/
+        len=strlen(pStr1);
+    }/*序列中只剩下一个代码串时，排序结束*/
+
+    /*复制最后这个代码串*/
+    len=strlen(pStr1);
+    strcpy(*pBuffer+loc2,pStr1);
+
+    /*修改动态存储区大小，使其正好放下排序后代码串*/
+    loc2+=len+1;
+    *pBuffer=(char*)realloc(*pBuffer,loc2);
+    free(pTemp);    /*释放最先申请的动态存储区*/
+    return loc2;    /*返回存放代码串的内存缓冲区实际大小*/
 }
 /**
 函数名称：SeekUniNode
 函数功能：按学校编号查找学校基本信息节点
-输入参数：hu主链头指针，uni_id学校编号
+输入参数：hu主链头指针，uni_name学校名称
 输出参数：无
 返回值：成功则返回结点的地址，否则返回NULL
 */
@@ -67,18 +688,24 @@ UNIVERSITY_NODE * SeekUniNode(UNIVERSITY_NODE * hu,char * uni_id)
 }
 /**
 函数名称：InsertUniNode
-函数功能：在十字链表的末尾插入一个高校结点
+函数功能：在十字链表的末尾插入一个高校结点 需要保证其中已经有一个结点 不然需要修改hu 这是不符合函数定义的
 输入参数：hu主链头指针，puni_node指向所要插入结点的指针
 输出参数：无
 返回值：BOOL型，TRUE表示成功，FALSE表示失败
 */
 BOOL InsertUniNode(UNIVERSITY_NODE * hu,UNIVERSITY_NODE * puni_node)
 {
+    UNIVERSITY_NODE * uni_temp;
     if(puni_node==NULL||hu==NULL){
         return FALSE;
     }
-    puni_node->next=hu->next;
-    hu->next=puni_node;
+    for(uni_temp=hu;uni_temp->next!=NULL;uni_temp=uni_temp->next){
+        printf("%s\n",uni_temp->uni_id);
+    }
+    uni_temp->next=puni_node;
+    puni_node->next=NULL;
+//    puni_node->next=hu->next;
+//    hu->next=puni_node;
     return TRUE;
 }
 /**
@@ -91,9 +718,26 @@ BOOL InsertUniNode(UNIVERSITY_NODE * hu,UNIVERSITY_NODE * puni_node)
 BOOL DelUniNode(UNIVERSITY_NODE * hu,char * uni_id)
 {
     UNIVERSITY_NODE * puni_node_prior=hu,*puni_node_current;
+    UNIVERSITY_NODE * uni_temp;
     puni_node_current=SeekUniNode(hu,uni_id);//hu的非空条件由seekuninode中返回的null留给下一行判断
     if(puni_node_current==NULL){
         return FALSE;
+    }
+    if(puni_node_current==hu){
+             while(puni_node_current->snext!=NULL)
+            {//这里调用了一个DelSpeNode删除专业节点的函数 但是这个函数还没有写出来 所以需要我们待会按照这样的形式去写。
+            DelSpeNode(puni_node_current,puni_node_current->snext->spe_id);
+            }
+            if(puni_node_current->next!=NULL){
+              uni_temp=puni_node_current->next;
+              *puni_node_current=*uni_temp;
+            free(uni_temp);
+            printf("高校节点完全删除完毕\n");
+            return TRUE;
+            }
+        printf("高校节点完全删除完毕\n");
+        free(puni_node_current);
+        return TRUE;
     }
     while(puni_node_prior->next!=puni_node_current){
         puni_node_prior=puni_node_prior->next;
@@ -285,7 +929,7 @@ int CreatList(UNIVERSITY_NODE ** phead){
     FILE * pFile;
     int find;
     int re=0;
-    if((pFile=fopen(gp_univ_info_filename,"rb"))==NULL){
+    if((pFile=fopen(gp_univ_info_filename,"rb+"))==NULL){
         printf("高校信息数据文件打开失败！\n");
         return re;
     }
@@ -309,7 +953,7 @@ int CreatList(UNIVERSITY_NODE ** phead){
     printf("高校信息数据加载成功！\n");
     *phead=hu;
     re +=4;
-    if((pFile=fopen(gp_spe_info_filename,"rb"))==NULL){
+    if((pFile=fopen(gp_spe_info_filename,"rb+"))==NULL){
         printf("专业基本信息数据文件打开失败！\n");
         return re;
     }
@@ -342,7 +986,7 @@ int CreatList(UNIVERSITY_NODE ** phead){
         }
     }/*end of while*/
     fclose(pFile);
-    if((pFile=fopen(gp_rec_info_filename,"rb"))==NULL)
+    if((pFile=fopen(gp_rec_info_filename,"rb+"))==NULL)
     {
         printf("招生信息数据文件打开失败！\n");
         return re;
@@ -387,7 +1031,260 @@ int CreatList(UNIVERSITY_NODE ** phead){
     fclose(pFile);
     return re;
 }
-
+//运行系统，在系统界面下运行用户所选择的功能函数
+void RunSystem(void)
+{
+	INPUT_RECORD inRec;
+	DWORD res;
+	COORD pos = { 0,0 };
+	BOOL bRet = TRUE;
+	int i,j;
+	int loc = 0, num;
+	int cNo, cAtt;     //cNo：字符单元层号，cAtt:字符单元属性
+	char vkc, asc;     //vkc：虚拟键代码，asc：字符的ASCII码值
+//	SetMainHotArea();  //给主菜单栏设置热区
+	while (bRet) {
+		//从控制台输入缓冲区读一条记录
+		ReadConsoleInput(gh_std_in, &inRec, 1, &res);
+		if (inRec.EventType == MOUSE_EVENT) /*如果记录由鼠标事件产生*/
+		{
+			pos = inRec.Event.MouseEvent.dwMousePosition;    /*获取鼠标坐标位置*/
+			cNo = gp_scr_att[pos.Y * SCR_COL + pos.X] & 3;   /*取该位置的层号*/
+			cAtt = gp_scr_att[pos.Y * SCR_COL + pos.X] >> 2; /*取该字符单元属性*/
+			if (cNo == 0)  /*层号为0,表明该位置未被弹出子菜单覆盖*/
+			{
+				/*cAtt>0表明该位置处于热区,cAtt!=gi_sel_menu表明该位置的主菜单项未被选中,gp_top_layer->LayerNo>0表明当前有子菜单弹出*/
+				if (cAtt > 0 && cAtt != gi_sel_menu && gp_top_layer->LayerNo > 0)
+				{
+					PopOff();            /*关闭弹出的子菜单*/
+					gi_sel_sub_menu = 0; /*将选中子菜单项的项号置为0*/
+				}
+				else  if (cAtt>0) TagMainMenu(cAtt); /*在鼠标所在主菜单项上做选中标记*/
+			}
+			else if (cAtt > 0) /*鼠标所在位置为弹出子菜单的菜单项字符单元*/
+				TagSubMenu(cAtt); /*在该子菜单项上做选中标记*/
+			if (inRec.Event.MouseEvent.dwButtonState == FROM_LEFT_1ST_BUTTON_PRESSED) /*如果按下鼠标左键一次*/
+			{
+				if (cNo == 0) /*层号为0，表明该位置未被弹出子菜单覆盖*/
+				{
+					if (cAtt > 0) /*如果该位置处于热区*/
+						PopMenu(cAtt);   /*弹出鼠标所在主菜单项对应的子菜单*/
+					else if (gp_top_layer->LayerNo > 0) /*如果该位置不属于主菜单项字符单元,且有子菜单弹出*/
+					{
+						PopOff();             /*关闭弹出的子菜单*/
+						gi_sel_sub_menu = 0;  /*将选中子菜单项的项号置为0*/
+					}
+				}
+				else /*层号不为0,表明该位置被弹出子菜单覆盖*/
+				{
+					if (cAtt > 0) /*如果该位置处于热区*/
+					{
+						PopOff();  /*关闭弹出的子菜单*/
+						gi_sel_sub_menu = 0;  /*将选中子菜单项的项号置为0*/
+						bRet = ExeFunction(gi_sel_menu, cAtt); /*执行对应功能函数:gi_sel_menu主菜单项号,cAtt子菜单项号*/
+					}
+				}
+			}
+			else if (inRec.Event.MouseEvent.dwButtonState == RIGHTMOST_BUTTON_PRESSED) /*如果按下鼠标右键*/
+			{
+				if (cNo == 0) /*层号为0，表明该位置未被弹出子菜单覆盖*/
+				{
+					PopOff();            /*关闭弹出的子菜单*/
+					gi_sel_sub_menu = 0; /*将选中子菜单项的项号置为0*/
+				}
+			}
+		}
+		else if (inRec.EventType == KEY_EVENT&&inRec.Event.KeyEvent.bKeyDown)
+		{    //记录由按键产生且键被按下
+			vkc = inRec.Event.KeyEvent.wVirtualKeyCode;    //按键虚拟键码
+			asc = inRec.Event.KeyEvent.uChar.AsciiChar;    //按键的ASCII值
+														   //系统帮助快捷键的F1的处理
+			if (vkc == 112)   //按下F1
+			{
+				if (gp_top_layer->LayerNo != 0)   //当前有子菜单弹出
+				{
+					PopOff();
+					gi_sel_sub_menu = 0;
+				}
+				bRet = ExeFunction(5, 1);
+			}
+			else if (inRec.Event.KeyEvent.dwControlKeyState&(LEFT_ALT_PRESSED | RIGHT_ALT_PRESSED))
+			{
+				switch (vkc)
+				{
+				case 88:  //ALT+X 退出
+					if (gp_top_layer->LayerNo != 0)
+					{
+						PopOff();
+						gi_sel_sub_menu = 0;
+					}
+					bRet = ExeFunction(1, 2);
+					break;
+				case 67: //ALT+C  清屏
+					if (gp_top_layer->LayerNo != 0)
+					{
+						PopOff();
+						gi_sel_sub_menu = 0;
+					}
+					bRet = ExeFunction(5, 3);
+					break;
+				case 70:  /*Alt+F*/
+					PopMenu(1);
+					break;
+				case 69: /*Alt+E*/
+					PopMenu(2);
+					break;
+				case 73: /*Alt+I*/
+					PopMenu(3);
+					break;
+				case 83: /*Alt+S*/
+					PopMenu(4);
+					break;
+				case 72: /*Alt+H*/
+					PopMenu(5);
+					break;
+				default:
+					break;
+				}
+			}
+			else if (asc == 0)  //方向控制键的处理
+			{
+				if (gp_top_layer->LayerNo == 0) //未弹出子菜单
+				{
+					switch (vkc)    //方向键（左、右、下）的处理
+					{
+					case 37: //左键
+						gi_sel_menu--;
+						if (gi_sel_menu == 0)
+							gi_sel_menu = 5;
+						TagMainMenu(gi_sel_menu);
+						break;
+					case 39: //右键
+						gi_sel_menu++;
+						if (gi_sel_menu == 6)
+							gi_sel_menu = 1;
+						TagMainMenu(gi_sel_menu);
+						break;
+					case 40: //下键
+						PopMenu(gi_sel_menu);
+						TagSubMenu(1);
+						break;
+					default:
+						break;
+					}
+				}
+				else     //已弹出子菜单时
+				{
+					//计算该子菜单中的第一项在子菜单字符串数组中的下标
+					loc = 0;
+					for ( i = 1; i < gi_sel_menu; i++)
+						loc += ga_sub_menu_count[i - 1];
+					switch (vkc)   //方向键（上、下、左、右）的处理
+					{
+					case 37:   //左键
+						gi_sel_menu--;
+						if (gi_sel_menu < 1)
+							gi_sel_menu = 5;
+						TagMainMenu(gi_sel_menu);
+						PopOff();
+						PopMenu(gi_sel_menu);
+						TagSubMenu(1);
+						break;
+					case 38:  //上键
+						num = gi_sel_sub_menu - 1;
+						if (num < 1)
+							num = ga_sub_menu_count[gi_sel_menu - 1];
+						if (strlen(ga_sub_menu[loc + num - 1]) == 0)
+							num--;
+						TagSubMenu(num);
+						break;
+					case 39:  //右键
+						gi_sel_menu++;
+						if (gi_sel_menu > 5)
+							gi_sel_menu = 1;
+						TagMainMenu(gi_sel_menu);
+						PopOff();
+						PopMenu(gi_sel_menu);
+						TagSubMenu(1);
+						break;
+					case 40:   //下键
+						num = gi_sel_sub_menu + 1;
+						if (num > ga_sub_menu_count[gi_sel_menu - 1])
+							num = 1;
+						if (strlen(ga_sub_menu[loc + num - 1]) == 0)
+							num++;
+						TagSubMenu(num);
+						break;
+					default:
+						break;
+					}
+				}
+			}
+			else if ((asc - vkc == 0) || (asc - vkc == 32))
+			{
+				//按下数字键或者字母键等普通键
+				if (gp_top_layer->LayerNo == 0)  //如果未弹出子菜单
+				{
+					switch (vkc)
+					{
+					case 70: /*f或F*/
+						PopMenu(1);
+						break;
+					case 69: /*e或E*/
+						PopMenu(2);
+						break;
+					case 73: /*i或I*/
+						PopMenu(3);
+						break;
+					case 83: /*s或S*/
+						PopMenu(4);
+						break;
+					case 72: /*h或H*/
+						PopMenu(5);
+						break;
+					case 13: /*回车*/
+						PopMenu(gi_sel_menu);
+						TagSubMenu(1);
+						break;
+					}
+				}
+				else   //已弹出子菜单时
+				{
+					if (vkc == 27)   //按下ESC
+					{
+						PopOff();
+						gi_sel_sub_menu = 0;
+					}
+					else if (vkc == 13)  //按下回车
+					{
+						num = gi_sel_sub_menu;
+						PopOff();
+						gi_sel_sub_menu = 0;
+						bRet = ExeFunction(gi_sel_menu, num);
+					}
+					else   //其他普通键
+					{
+						//计算该子菜单中的第一项在子菜单字符串数组中的下标
+						loc = 0;
+						for ( i = 1; i < gi_sel_menu; i++)
+							loc += ga_sub_menu_count[i - 1];
+						//依次与当前子菜单中每一项的代表字符进行比较
+						for ( i = loc; i < loc + ga_sub_menu_count[gi_sel_menu - 1]; i++)
+						{
+							if (strlen(ga_sub_menu[i]) > 0 && vkc == ga_sub_menu[i][1])
+							{
+								PopOff();
+								gi_sel_sub_menu = 0;
+								bRet = ExeFunction(gi_sel_menu, i - loc + 1);
+							}
+						}
+					}
+				}
+			}
+		}
+//		CurState(0);
+	}
+}
 /*
 RunSys
 运行系统 在系统主界面下运行用户所选择的功能模块
@@ -673,36 +1570,35 @@ BOOL ExeFunction(int m,int s)
     int i,loc;
 
     //将功能函数入口地址存入与功能函数所在主菜单和子菜单号对应下表的数组元素
-    /*pFunction[0]=SaveData;
-    pFunction[1]=BackupData;
-    pFunction[2]=RestoreData;
-    pFunction[3]=ExitSys;
-    pFunction[4]=;
-    pFunction[5]=;
-    pFunction[6]=;
-    pFunction[7]=;
-    pFunction[8]=;
-    pFunction[9]=;
-    pFunction[10]=;
-    pFunction[11]=;
-    pFunction[12]=;
-    pFunction[13]=;
-    pFunction[14]=;
-    pFunction[15]=;
-    pFunction[16]=;
-    pFunction[17]=;
-    pFunction[18]=;
-    pFunction[19]=;
-    pFunction[20]=;
-    pFunction[21]=;
-    pFunction[22]=;*/
+    pFunction[0]=Save_list;
+//    pFunction[1]=BackupData;
+    pFunction[2]=InsertUniPrint;
+//    pFunction[3]=ExitSys;
+    pFunction[4]=DelUniPrint;
+    pFunction[5]=NULL;
+    pFunction[6]=InsertSpeprint;
+//    pFunction[7]=;
+    pFunction[8]=DelSpePrint;
+    pFunction[9]=NULL;
+    pFunction[10]=InsertRecprint;
+//    pFunction[11]=;
+    pFunction[12]=DelRecPrint;
+    pFunction[13]=SeekUniPrint;
+    pFunction[14]=SeekSpePrint;
+    pFunction[15]=SeekRecPrint;
+//    pFunction[16]=;
+//    pFunction[17]=;
+//    pFunction[18]=;
+    pFunction[19]=Theme;
+    pFunction[20]=AboutSys;
+    pFunction[21]=ClearScreen;
 
     for(i=1,loc=0;i<m;i++)
     {
         loc += ga_sub_menu_count[i-1];
     }//算下标
     loc += s-1;
-    if(pFunction[loc]()!=FALSE)
+    if(pFunction[loc]!=NULL)
     {
         bRet=(* pFunction[loc])();//用函数指针调用所指函数
     }
@@ -902,7 +1798,7 @@ void PopOff(void){
     }
     free(gp_top_layer->pContent);//释放动态存储区域
     free(gp_top_layer->pScrAtt);
-    free(gp_top_layer);
+    //free(gp_top_layer);
     gp_top_layer=nextLayer;
     gi_sel_sub_menu=0;
     return;
@@ -1131,9 +2027,9 @@ clearscreen
 清屏函数
 无参数无返回值
 ***/
-void ClearScreen(void){
+BOOL ClearScreen(void){
     CONSOLE_SCREEN_BUFFER_INFO bInfo;
-    COORD home={0,0};
+    COORD home={0,1};
     DWORD size;
     DWORD cCharsWritten;
     GetConsoleScreenBufferInfo(gh_std_out,&bInfo);//取屏幕缓冲区信息
@@ -1142,35 +2038,7 @@ void ClearScreen(void){
     FillConsoleOutputAttribute(gh_std_out,bInfo.wAttributes,size,home,&num_written);
     //将屏幕缓冲区所有单元填充为空格字符
     FillConsoleOutputCharacter(gh_std_out,' ',size,home,&num_written);
-    return;
-
+	SetConsoleCursorPosition(gh_std_out, home);
+    return TRUE;
 }
 
-#define PERR(bSuccess, api){if(!(bSuccess)) printf("%s:Error %d from %s \on line %d\n", __FILE__, GetLastError(), api, __LINE__);}
-void learScreen( void)
-{
-COORD coordScreen = { 0, 0 }; /* here's where we'll home the
-cursor */
-BOOL bSuccess;
-DWORD cCharsWritten;
-CONSOLE_SCREEN_BUFFER_INFO csbi; /* to get buffer info */
-DWORD dwConSize; /* number of character cells in
-the current buffer */
-/* get the number of character cells in the current buffer */
-bSuccess = GetConsoleScreenBufferInfo( gh_std_out, &csbi );
-//PERR( bSuccess, "GetConsoleScreenBufferInfo" );
-dwConSize = csbi.dwSize.X * csbi.dwSize.Y;
-/* fill the entire screen with blanks */
-bSuccess = FillConsoleOutputCharacter( gh_std_out, (TCHAR) ' ',dwConSize, coordScreen, &cCharsWritten );
-//PERR( bSuccess, "FillConsoleOutputCharacter" );
-/* get the current text attribute */
-bSuccess = GetConsoleScreenBufferInfo( gh_std_out, &csbi );
-//PERR( bSuccess, "ConsoleScreenBufferInfo" );
-/* now set the buffer's attributes accordingly */
-bSuccess = FillConsoleOutputAttribute( gh_std_out, csbi.wAttributes,
-dwConSize, coordScreen, &cCharsWritten );
-//PERR( bSuccess, "FillConsoleOutputAttribute" );
-/* put the cursor at (0, 0) */
-//bSuccess = SetConsoleCursorPosition( gh_std_out, coordScreen );
-//PERR( bSuccess, "SetConsoleCursorPosition" );
-return;}
