@@ -39,9 +39,52 @@ int main()
     ClearScreen();
     CreatList(&gp_head);
     RunSys(&gp_head);
+    CloseSys(gp_head);
 //    RunSystem();
-    getch();
+//    getch();
     return 0;
+}
+BOOL ExitSys(void){
+    char ch;
+    ClearScreen();
+    printf("\n\t\t\t\t确定要退出系统吗？\n");
+    printf("\n\t\t\t\t输入 q 确定\n");
+    while((ch=getchar())=='\n'){
+        continue;
+    }
+    if(ch=='q'||ch=='Q'){
+       return FALSE;
+       }
+    return TRUE;
+}
+void CloseSys(UNIVERSITY_NODE *phead)
+{
+	UNIVERSITY_NODE *p1 = phead, *pp1;
+	SPECIALTY_NODE *p2, *pp2;
+	RECRUIT_NODE *p3, *pp3;
+	//释放链表存储区
+	while (p1 != NULL) {
+		pp1 = p1->next;
+		p2 = p1->snext;
+		while (p2 != NULL) {
+			pp2 = p2->next;
+			p3 = p2->rnext;
+			while (p3 != NULL) {
+				pp3 = p3->next;
+				free(p3);
+				p3 = pp3;
+			}
+			free(p2);
+			p2 = pp2;
+		}
+		free(p1);
+		p1 = pp1;
+	}
+
+	ClearScreen();
+	free(gp_buff_menubar_info);
+	CloseHandle(gh_std_in);
+	CloseHandle(gh_std_out);
 }
 BOOL Theme(void)
 {
@@ -85,6 +128,404 @@ BOOL AboutSys(void)
 	printf("    │ [2]李开,卢萍,曹计昌. C语言实验与课程设计,北京：科学出版社,2011;│\n");
 	printf("    └────────────────────────────────┘\n");
 	return bRet;
+}
+BOOL EnrollmentRate(void)
+{
+//	CurState(1);
+	ClearScreen();
+	COORD pos = { 0,4 };
+	UNIVERSITY_NODE *puni=gp_head;
+	SPECIALTY_NODE *pspe;
+	RECRUIT_NODE *prec;
+	int i,j;
+	char yearnum[5];
+	char ch, temp;
+	unsigned long  prenum[PROVINCE_NUM]={0},renum[PROVINCE_NUM]={0};
+	int find = 0;  //是否查找到省份招生信息
+	printf("请输入年份: 如 2016\n");
+	while(scanf("%s",yearnum)==EOF){
+        getchar();
+	}
+	printf("高校名         省份        年份    预录取人数    实际录取人数    录取率");
+	  //按照省份遍历查找符合条件的省份
+		for (puni = gp_head; puni != NULL; puni = puni->next) {
+            find=0;
+            for ( i = 0; i < PROVINCE_NUM; i++) {
+                        prenum[i]=0;
+                        renum[i]=0;
+                    }
+			pspe = puni->snext;
+			while (pspe != NULL) {
+				prec = pspe->rnext;
+				while (prec != NULL) {
+				    if(strcmp(prec->year,yearnum)==0){
+				        find=1;
+                      for ( i = 0; i < PROVINCE_NUM; i++) {
+                        prenum[i]+=prec->pre_num[i];
+                        renum[i]+=prec->re_num[i];
+						}
+				    }
+					prec = prec->next;
+				}
+					pspe = pspe->next;
+			}
+			if(find!=1){
+                continue;
+			}
+			for(i=0;i<PROVINCE_NUM;i++){
+                Gotoxy(pos); printf("%-s", puni->uni_id); pos.X += 15;
+                Gotoxy(pos); printf("%-s", prov_name[i]); pos.X += 12;
+                Gotoxy(pos); printf("%-s", yearnum); pos.X += 8;
+                Gotoxy(pos); printf("%lu", prenum[i]); pos.X += 14;
+                Gotoxy(pos); printf("%lu", renum[i]); pos.X += 16;
+                Gotoxy(pos); printf("%.3f", (1.0*renum[i]) / prenum[i]);
+                if (pos.Y > 20) {
+                    printf("\n是否需要显示下一页的内容？yes or no\n");
+//                    ch = getchar();
+                    while ((ch = getchar()) == '\n')
+                        continue;
+                    if (ch == 'Y' || ch == 'y') {
+                        ClearScreen();
+                        printf("高校名         省份        年份    预录取人数    实际录取人数    录取率");
+                        pos.X = 0;
+                        pos.Y = 1;
+                    }
+                    else
+                        return TRUE;
+                    }
+							pos.Y += 1;
+							pos.X = 0;
+			}
+
+		}
+
+	return TRUE;
+}
+//将光标置于pos位置
+inline void Gotoxy(COORD pos)
+{
+	SetConsoleCursorPosition(gh_std_out, pos);      /*设置光标位置在pos处*/
+}
+BOOL InquireScore(void)    //按分数查询
+{
+//	CurState(1);
+	ClearScreen();
+	UNIVERSITY_NODE *puni = gp_head;
+	SPECIALTY_NODE *pspe;
+	RECRUIT_NODE *prec;
+	COORD pos = { 0,4 };
+	int i,j;
+	int tag = 1;  //标题标签
+	char ch;  //接受用户的输入
+	char Prov_name[20];
+	unsigned int score=600;
+	printf("\t请输入所在的省份:");
+	while (scanf("%s", Prov_name) == EOF) {
+		getchar();
+		scanf("%s", Prov_name);
+	}   getchar();
+	for(i=0;i<PROVINCE_NUM;i++){
+        if(strcmp(Prov_name,prov_name[i])==0){
+            break;
+        }
+	}
+	if(i==PROVINCE_NUM){
+        printf("没有找到该省份\n");
+        return TRUE;
+	}
+	printf("\t请输入要查询的分数:");
+	while (scanf("%u", &score) == EOF||score>750||score<11) {
+		;
+	}   getchar();
+	ClearScreen();
+	printf("\n将给出分数范围在%u~%u内符合条件的学校及专业!\n", score - 10, score + 10);
+	while (puni != NULL) {   //遍历查找
+		pspe = puni->snext;
+		while (pspe != NULL) {
+			prec = pspe->rnext;
+			while (prec != NULL) {
+
+						if ((score - 10) < prec->highest_r[i]&&(score + 10) > prec->lowest_r[i])
+						{
+							if (tag==1) {
+								tag = 0;
+								printf("学校名称\t专业名称\t\t年份    \t录取最低分\t录取最高分\n");
+							}
+							Gotoxy(pos);
+							printf("%-16s%-24s%-16s%-16u%-16u", prec->uni_id, prec->spe_id,prec->year, prec->lowest_r[i],prec->highest_r[i]);
+							pos.Y += 1;
+							if (pos.Y > 22) {
+								printf("\n是否需要显示下一页的内容？yes or no\n");
+								ch = getchar();
+								while ((getchar()) != '\n')
+									continue;
+								if (ch == 'Y' || ch == 'y') {
+									ClearScreen();
+									tag = 1;
+									pos.Y = 2;
+								}
+								else
+									return TRUE;
+							}
+						}
+
+                prec = prec->next;
+			}
+			pspe = pspe->next;
+		}
+		puni = puni->next;
+	}
+	return TRUE;
+}
+
+/**
+*函数名称：ModRecPrint
+*函数功能：修改招生信息
+*输入参数：无
+*输出参数：无
+*返回值：总是为TRUE
+*/
+BOOL ModRecPrint(void){
+    char  str[80];
+    char ch;
+    int provin=100;
+    int i,j;
+    UNIVERSITY_NODE * puni;
+    SPECIALTY_NODE * pspe;
+    RECRUIT_NODE * prec;
+//    RECRUIT_NODE temp_rec;
+    ClearScreen();
+    printf("请输入将要修改的招生信息所属的高校的名称:\n");
+//    printf("|*注意！高校的所属的专业、招生信息也将一并被删除!*|\n");
+    scanf("%s",str);
+    puni=SeekUniNode(gp_head,str);
+    if(puni==NULL){
+        printf("没有找到该学校\n");
+        return TRUE;
+    }
+    printf("找到相关的高校信息如下:\n");
+    printf("\t学校名称:    %s\n", puni->uni_id);
+    printf("\t学校编号:    %s\n", puni->uni_name);
+   //printf("\t学校全国排名: %d\n", puni->rank); Delay();
+    //printf("\t学校类型:    %s\n", puni->schoolType);
+    printf("\t学校地址:    %s\n", puni->uni_add);
+    printf("\t联系方式:    %s\n", puni->uni_call);
+    printf("请输入将要修改的招生信息所属专业名称:\n");
+    scanf("%s",str);
+    pspe=SeekSpeNode(puni,str);
+    if(pspe==NULL){
+        printf("没有找到该专业\n");
+        return TRUE;
+    }
+    printf("找到相关的专业信息如下:\n");
+    printf("\t学校名称:    %s\n", pspe->uni_id);
+    printf("\t学校编号:    %s\n", pspe->uni_name);
+   //printf("\t学校全国排名: %d\n", puni->rank); Delay();
+    //printf("\t学校类型:    %s\n", puni->schoolType);
+    printf("\t专业名称:    %s\n", pspe->spe_id);
+    printf("\t专业编号:    %s\n", pspe->spe_name);
+    printf("\t专业排名:    %d\n", pspe->rank);
+    printf("请输入将要修改的招生年份\n");
+    scanf("%s",str);
+    prec=SeekRecNode(pspe,str);
+//    temp_rec=*prec;
+    if(prec==NULL){
+        printf("没有找到该招生信息\n");
+        return TRUE;
+    }
+    printf("请输入要修改的省份： 如 1\n");
+    for(i=0;i<PROVINCE_NUM;i++){
+        printf("%d %s \n",i,prov_name[i]);
+    }
+    scanf("%d",&provin);
+    while(provin>=PROVINCE_NUM){
+        printf("输入数据不符合要求,请重新输入要修改的省份\n");
+        scanf("%d",&provin);
+    }
+    printf("选择要修改的项目\n");
+    printf("a 招生计划人数 b 实际招生人数 c 最低录取分数 d 最高录取分数\n");
+    while((ch=getchar())=='\n'){
+          ;
+          }
+    switch(ch){
+        case 'a':
+        case 'A':
+            printf("输入修改后的招生计划人数");
+            scanf("%lu",&(prec->pre_num[provin]));
+            break;
+        case 'b':
+        case 'B':
+            printf("输入修改后的实际招生人数");
+            scanf("%lu",&(prec->re_num[provin]));
+            break;
+        case 'c':
+        case 'C':
+            printf("输入修改后的最低录取分数");
+            scanf("%u",&(prec->lowest_r[provin]));
+            break;
+        case 'd':
+        case 'D':
+            printf("输入修改后的最高录取分数");
+//            printf("最高录取分数%u\n",prec->highest_r[provin]);
+            scanf("%u",&(prec->highest_r[i]));
+//            printf("最高录取分数%u\n",prec->highest_r[provin]);
+            break;
+        default:
+            break;
+    }
+//    temp_rec=*prec;
+     printf("该信息已经被修改！\n");
+    return TRUE;
+}
+/**
+*函数名称：ModSpePrint
+*函数功能：修改专业
+*输入参数：无
+*输出参数：无
+*返回值：总是为TRUE
+*/
+BOOL ModSpePrint(void){
+    char  str[80];
+    char ch;
+    UNIVERSITY_NODE * puni;
+    SPECIALTY_NODE * pspe;
+    RECRUIT_NODE * rec_temp;
+    ClearScreen();
+    printf("请输入将要修改的专业所属的高校的名称:\n");
+//    printf("|*注意！高校的所属的专业、招生信息也将一并被删除!*|\n");
+    scanf("%s",str);
+    puni=SeekUniNode(gp_head,str);
+    if(puni==NULL){
+        printf("没有找到该学校\n");
+        return TRUE;
+    }
+    printf("找到相关的高校信息如下:\n");
+    printf("\t学校名称:    %s\n", puni->uni_id);
+    printf("\t学校编号:    %s\n", puni->uni_name);
+   //printf("\t学校全国排名: %d\n", puni->rank); Delay();
+    //printf("\t学校类型:    %s\n", puni->schoolType);
+    printf("\t学校地址:    %s\n", puni->uni_add);
+    printf("\t联系方式:    %s\n", puni->uni_call);
+    printf("请输入将要修改的专业名称:\n");
+    scanf("%s",str);
+    pspe=SeekSpeNode(puni,str);
+    if(pspe==NULL){
+        printf("没有找到该专业\n");
+        return TRUE;
+    }
+    printf("找到相关的专业信息如下:\n");
+    printf("\t学校名称:    %s\n", pspe->uni_id);
+    printf("\t学校编号:    %s\n", pspe->uni_name);
+   //printf("\t学校全国排名: %d\n", puni->rank); Delay();
+    //printf("\t学校类型:    %s\n", puni->schoolType);
+    printf("\t专业名称:    %s\n", pspe->spe_id);
+    printf("\t专业编号:    %s\n", pspe->spe_name);
+    printf("\t专业排名:    %d\n", pspe->rank);
+    printf("选择要修改的项目\n");
+    printf("a 专业名称 b 专业编号 c 专业排名\n");
+    while((ch=getchar())=='\n'){
+          ;
+          }
+    switch(ch){
+        case 'a':
+        case 'A':
+            printf("请输入修改后的专业名称\n");
+            scanf("%s",pspe->spe_id);
+            for(rec_temp=pspe->rnext;rec_temp!=NULL;rec_temp=rec_temp->next){
+                strcpy(rec_temp->spe_id,pspe->spe_id);
+            }
+            break;
+        case 'b':
+        case 'B':
+            printf("请输入修改后的专业编号\n");
+            scanf("%s",pspe->spe_name);
+            for(rec_temp=pspe->rnext;rec_temp!=NULL;rec_temp=rec_temp->next){
+                strcpy(rec_temp->spe_name,pspe->spe_name);
+            }
+            break;
+        case 'c':
+        case 'C':
+            printf("请输入修改后的专业排名\n");
+            scanf("%d",&(pspe->rank));
+            break;
+        default:
+            break;
+    }
+     printf("该信息已经被修改！\n");
+    return TRUE;
+}
+/**
+*函数名称：ModUniPrint
+*函数功能：修改学校
+*输入参数：无
+*输出参数：无
+*返回值：总是为TRUE
+*/
+BOOL ModUniPrint(void){
+    char  str[80];
+    char ch;
+    UNIVERSITY_NODE * puni;
+    SPECIALTY_NODE * spe_temp;
+    RECRUIT_NODE * rec_temp;
+    ClearScreen();
+    printf("请输入将要修改的高校的名称:\n");
+    printf("|*注意！高校下所属的专业、招生关联信息也将一并被修改!*|\n");
+    scanf("%s",str);
+    puni=SeekUniNode(gp_head,str);
+    if(puni==NULL){
+        printf("没有找到该学校\n");
+        return TRUE;
+    }
+    printf("找到相关的高校信息如下:\n");
+    printf("\t学校名称:    %s\n", puni->uni_id);
+    printf("\t学校编号:    %s\n", puni->uni_name);
+   //printf("\t学校全国排名: %d\n", puni->rank); Delay();
+    //printf("\t学校类型:    %s\n", puni->schoolType);
+    printf("\t学校地址:    %s\n", puni->uni_add);
+    printf("\t联系方式:    %s\n", puni->uni_call);
+    printf("选择要修改的项目\n");
+    printf("a 学校名称 b 学校编号 c 学校地址 d 联系方式\n");
+    while((ch=getchar())=='\n'){
+          ;
+          }
+    switch(ch){
+        case 'a':
+        case 'A':
+            printf("请输入修改后的学校名称\n");
+            scanf("%s",puni->uni_id);
+            for(spe_temp=puni->snext;spe_temp!=NULL;spe_temp=spe_temp->next){
+                strcpy(spe_temp->uni_id,puni->uni_id);
+                for(rec_temp=spe_temp->rnext;rec_temp!=NULL;rec_temp=rec_temp->next){
+                    strcpy(rec_temp->uni_id,puni->uni_id);
+                }
+            }
+            break;
+        case 'b':
+        case 'B':
+            printf("请输入修改后的学校编号\n");
+            scanf("%s",puni->uni_name);
+            for(spe_temp=puni->snext;spe_temp!=NULL;spe_temp=spe_temp->next){
+                strcpy(spe_temp->uni_name,puni->uni_name);
+                for(rec_temp=spe_temp->rnext;rec_temp!=NULL;rec_temp=rec_temp->next){
+                    strcpy(rec_temp->uni_name,puni->uni_name);
+                }
+            }
+            break;
+        case 'c':
+        case 'C':
+            printf("请输入修改后的学校地址\n");
+            scanf("%s",puni->uni_add);
+            break;
+        case 'd':
+        case 'D':
+            printf("请输入修改后的学校联系方式\n");
+            scanf("%s",puni->uni_call);
+            break;
+        default:
+            break;
+    }
+    printf("该信息已经被修改！\n");
+    return TRUE;
 }
 /**
 *函数名称：InsertUniPrint
@@ -159,6 +600,7 @@ BOOL InsertSpeprint(void){
 	pspe->next=NULL;
 	pspe->rnext=NULL;
 	InsertSpeNode(puni,pspe);
+	printf("\n插入成功\n");
 	return TRUE;
 }
 /**
@@ -227,6 +669,7 @@ BOOL InsertRecprint(void){
 	strcpy(prec->spe_name,pspe->spe_name);
 	prec->next=NULL;
 	InsertRecNode(pspe,prec);
+	printf("\n插入成功\n");
 	return TRUE;
 }
 /**
@@ -411,9 +854,9 @@ BOOL SeekRecPrint(void)
                 scanf("%s",str3);
                 pspe=SeekSpeNode(puni,str3);
                 if(pspe!=NULL){
-                    printf("高校名称\t专业名称\t年份\t招生计划\t实际录取人数\t最低分数线\n");
+                    printf("高校名称\t 专业名称\t   年份  \t招生计划\t实际录取人数\t最低分数线\n");
                     for(prec=pspe->rnext;prec!=NULL;prec=prec->next){
-                        printf("%s %s %s %lu %lu %ud\n",prec->uni_id,prec->spe_id,prec->year,prec->pre_num[i],prec->re_num[i],prec->lowest_r[i]);
+                        printf("%-15s%-20s%-15s%-15lu%-15lu%-15u\n",prec->uni_id,prec->spe_id,prec->year,prec->pre_num[i],prec->re_num[i],prec->lowest_r[i]);
                     }
                 return TRUE;
             }
@@ -541,6 +984,7 @@ BOOL Save_list(void)
 	fclose(fout2);
 	fclose(fout3);
 //	fclose(fout4);
+//    ClearScreen();
 	printf("【 相关数据已保存! 】\n");
 	return TRUE;
 }
@@ -700,7 +1144,7 @@ BOOL InsertUniNode(UNIVERSITY_NODE * hu,UNIVERSITY_NODE * puni_node)
         return FALSE;
     }
     for(uni_temp=hu;uni_temp->next!=NULL;uni_temp=uni_temp->next){
-        printf("%s\n",uni_temp->uni_id);
+//        printf("%s\n",uni_temp->uni_id);
     }
     uni_temp->next=puni_node;
     puni_node->next=NULL;
@@ -861,24 +1305,26 @@ BOOL InsertRecNode(SPECIALTY_NODE * hspe,RECRUIT_NODE * prec_node)
     if(hspe==NULL||prec_node==NULL){
         return FALSE;
     }
-    if(prec_node_temp==NULL)
-    {
-        hspe->rnext=prec_node;
-        return TRUE;
-    }
-    if(strcmp(prec_node->year,prec_node_temp->year)>=0){
-        prec_node->next=prec_node_temp;
-        hspe->rnext=prec_node;
-        return TRUE;
-    }
-    for(;prec_node_temp->next!=NULL;prec_node_temp=prec_node_temp->next){
-         if(strcmp(prec_node->year,prec_node_temp->next->year)>=0){
-            prec_node->next=prec_node_temp->next;
-            prec_node_temp->next=prec_node;
-            return TRUE;
-         }
-    }
-    prec_node_temp->next=prec_node;
+    hspe->rnext=prec_node;
+    prec_node->next=prec_node_temp;
+//    if(prec_node_temp==NULL)
+//    {
+//        hspe->rnext=prec_node;
+//        return TRUE;
+//    }
+//    if(strcmp(prec_node->year,prec_node_temp->year)>=0){
+//        prec_node->next=prec_node_temp;
+//        hspe->rnext=prec_node;
+//        return TRUE;
+//    }
+//    for(;prec_node_temp->next!=NULL;prec_node_temp=prec_node_temp->next){
+//         if(strcmp(prec_node->year,prec_node_temp->next->year)>=0){
+//            prec_node->next=prec_node_temp->next;
+//            prec_node_temp->next=prec_node;
+//            return TRUE;
+//         }
+//    }
+//    prec_node_temp->next=prec_node;
     return TRUE;
 }
 /**
@@ -929,12 +1375,13 @@ int CreatList(UNIVERSITY_NODE ** phead){
     FILE * pFile;
     int find;
     int re=0;
+    printf("\n\n\n\n\n\n\n\n\n\n\n\n\n");
     if((pFile=fopen(gp_univ_info_filename,"rb+"))==NULL){
-        printf("高校信息数据文件打开失败！\n");
+        printf("\t\t高校信息数据文件打开失败！\n\n");
         return re;
     }
-    printf("高校信息数据文件打开成功！\n");
-
+    printf("\t\t\t高校信息数据文件打开成功！\n\n");
+    Delay();Delay();Delay();Delay();
     /*从数据文件中读取高校信息数据，存入以后进先出方式建立的主链中*/
     while(!feof(pFile))
     {
@@ -947,17 +1394,18 @@ int CreatList(UNIVERSITY_NODE ** phead){
     fclose(pFile);
     if(hu==NULL)
     {
-        printf("高校信息数据文件加载失败！\n");
+        printf("\t\t\t高校信息数据文件加载失败！\n\n");
         return re;
     }
-    printf("高校信息数据加载成功！\n");
+    printf("\t\t\t高校信息数据加载成功！\n\n");
     *phead=hu;
     re +=4;
+    Delay();Delay();Delay();Delay();
     if((pFile=fopen(gp_spe_info_filename,"rb+"))==NULL){
-        printf("专业基本信息数据文件打开失败！\n");
+        printf("\t\t\t专业基本信息数据文件打开失败！\n\n");
         return re;
     }
-    printf("专业基本信息数据文件打开成功！\n");
+    printf("\t\t\t专业基本信息数据文件打开成功！\n\n");
     re += 8;
 
     /*从数据文件读取学生基本信息存入主链对应结点的学生基本信息支链中*/
@@ -986,12 +1434,13 @@ int CreatList(UNIVERSITY_NODE ** phead){
         }
     }/*end of while*/
     fclose(pFile);
+    Delay();Delay();Delay();Delay();
     if((pFile=fopen(gp_rec_info_filename,"rb+"))==NULL)
     {
-        printf("招生信息数据文件打开失败！\n");
+        printf("\t\t\t招生信息数据文件打开失败！\n\n");
         return re;
     }
-    printf("招生信息数据文件打开成功！\n");
+    printf("\t\t\t招生信息数据文件打开成功！\n\n");
     re+=16;
 
     /*从数据文件中读取专业招生信息数据，存入专业基本信息支链对于结点的招生支链中*/
@@ -1006,7 +1455,8 @@ int CreatList(UNIVERSITY_NODE ** phead){
         find=0;
         while(pUnivNode!=NULL&&find==0)
         {
-            pSpeNode=pUnivNode->snext;
+            if(strcmp(pUnivNode->uni_id,pRecNode->uni_id)==0){
+                pSpeNode=pUnivNode->snext;
             while(pSpeNode!=NULL&&find==0)
             {
                 if(strcmp(pSpeNode->spe_id,pRecNode->spe_id)==0)
@@ -1016,6 +1466,10 @@ int CreatList(UNIVERSITY_NODE ** phead){
                 }
                 pSpeNode=pSpeNode->next;
             }/*end of while*/
+            }
+            if(find){
+                break;
+            }
             pUnivNode=pUnivNode->next;
         }/*end of while*/
         if(find)/*如果找到，则将结点以后进先出的方式插入招生信息支链中*/
@@ -1571,27 +2025,27 @@ BOOL ExeFunction(int m,int s)
 
     //将功能函数入口地址存入与功能函数所在主菜单和子菜单号对应下表的数组元素
     pFunction[0]=Save_list;
-//    pFunction[1]=BackupData;
+    pFunction[1]=ExitSys;
     pFunction[2]=InsertUniPrint;
-//    pFunction[3]=ExitSys;
+    pFunction[3]=ModUniPrint;
     pFunction[4]=DelUniPrint;
     pFunction[5]=NULL;
     pFunction[6]=InsertSpeprint;
-//    pFunction[7]=;
+    pFunction[7]=ModSpePrint;
     pFunction[8]=DelSpePrint;
     pFunction[9]=NULL;
     pFunction[10]=InsertRecprint;
-//    pFunction[11]=;
+    pFunction[11]=ModRecPrint;
     pFunction[12]=DelRecPrint;
     pFunction[13]=SeekUniPrint;
     pFunction[14]=SeekSpePrint;
     pFunction[15]=SeekRecPrint;
-//    pFunction[16]=;
+    pFunction[16]=InquireScore;
 //    pFunction[17]=;
-//    pFunction[18]=;
-    pFunction[19]=Theme;
-    pFunction[20]=AboutSys;
-    pFunction[21]=ClearScreen;
+    pFunction[17]=EnrollmentRate;
+    pFunction[18]=Theme;
+    pFunction[19]=AboutSys;
+    pFunction[20]=ClearScreen;
 
     for(i=1,loc=0;i<m;i++)
     {

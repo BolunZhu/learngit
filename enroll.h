@@ -108,11 +108,11 @@ char * gp_univ_info_filename="univ.dat";    //高校信息数据文件
 char * gp_spe_info_filename="spe.dat";  //专业信息数据文件
 char * gp_rec_info_filename="rec.dat";  //招生信息数据文件
 char * ga_main_menu[]={
-"文件（F）",
-"数据维护（M）",
-"数据查询（Q）",
-"数据统计（S）",
-"帮助（H）"
+"[F]文件",
+"[M]数据维护",
+"[Q]数据查询",
+"[S]数据统计",
+"[H]帮助"
 };
 /*char * ga_sub_menu[]={
     "数据保存",
@@ -135,11 +135,11 @@ char *ga_sub_menu[] = { "[S]数据保存","[X]退出 Alt+X",
 "[1]插入高校","[2]修改高校","[3]删除高校","",
 "[4]插入专业","[5]修改专业","[6]删除专业","",
 "[7]插入招生信息","[8]修改招生信息","[9]删除招生信息",
-"[G]高校查询","[M]专业查询","[R]招生信息查询","[P]省份批次信息查询","[S]按分数查询",
-"[G]高校录取率",
+"[G]高校查询","[M]专业查询","[R]招生信息查询","[S]按分数查询",
+"[G]高校录取情况查询",
 "[T]帮助主题 F1","[A]关于系统","[C]清屏 Alt+C"
 };
-int ga_sub_menu_count[] = { 2,11,5,1,3 };   //各主菜单项下面的子菜单个数
+int ga_sub_menu_count[] = { 2,11,4,1,3 };   //各主菜单项下面的子菜单个数
 int gi_sel_menu=1; //被选中的主菜单序号 初始为1
 int gi_sel_sub_menu=0;  //被选中的子菜单项号，初始为0 表示未选中
 
@@ -170,11 +170,16 @@ BOOL DelSpeNode(UNIVERSITY_NODE * huni,char * spe_id);
 RECRUIT_NODE * SeekRecNode(SPECIALTY_NODE * hspe,char * year);
 BOOL InsertRecNode(SPECIALTY_NODE * hspe,RECRUIT_NODE * prec_node);
 BOOL DelRecNode(SPECIALTY_NODE * hspe,char * year);
-BOOL Save_list(void);//临时借用函数
-BOOL AboutSys(void);//临时借用函数
-inline void Delay(void);//临时借用函数
-BOOL Theme(void);//临时借用函数
-void RunSystem(void);//临时借用函数
+BOOL Save_list(void);//debug
+BOOL AboutSys(void);//
+inline void Delay(void);//
+BOOL Theme(void);//
+void RunSystem(void);//
+BOOL EnrollmentRate(void);//
+void CloseSys(UNIVERSITY_NODE *phead);//
+inline void Gotoxy(COORD pos);//
+BOOL InquireScore(void);//debug
+BOOL ExitSys(void);//
 BOOL SeekUniPrint(void);
 BOOL SeekSpePrint(void);
 BOOL SeekRecPrint(void);
@@ -184,6 +189,9 @@ BOOL DelRecPrint(void);
 BOOL InsertUniPrint(void);
 BOOL InsertSpeprint(void);
 BOOL InsertRecprint(void);
+BOOL ModUniPrint(void);
+BOOL ModSpePrint(void);
+BOOL ModRecPrint(void);
 BOOL ClearScreen(void);
 void ShowMenu(void);
 void PopMenu(int num);  //显示菜单栏
